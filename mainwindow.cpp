@@ -7,7 +7,7 @@
 
 Piece *redObject[16];
 Piece *greenObject[16];
-Piece *board[8][8];
+Piece *board[8][8] = {nullptr};
 
 void drawPieces(QPainter painter){
     printf("Printing Pieces");
@@ -66,6 +66,20 @@ MainWindow::MainWindow(QWidget *parent)
 
         Piece *green_obje = greenObject[i];
         board[green_obje->x][green_obje->y] = green_obje;
+    }
+    for(int i=0;i<8;i++){
+        for(int j=0;j<8;j++){
+            if(board[i][j] == nullptr){
+                Color co;
+                if((i+j)%2 == 1)
+                    co = Color::black;
+                else
+                    co = Color::white;
+                Piece *x = new Piece(i,j,co, this);
+                x->setPos(QPoint(j*50+25,i*50+25));
+                board[i][j] = x;
+            }
+        }
     }
 
 }

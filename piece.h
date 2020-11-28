@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QPushButton>
 #include <mainwindow.h>
-enum Color{red, green, blank, selected};
+enum Color{red, green, blank, selected, black, white};
 class Piece:QPushButton
 {
     Q_OBJECT

@@ -21,25 +21,45 @@ void Piece::changeColor(Color col){
             this->setStyleSheet(
                     "background-color: green;"
                     "border: 1px solid black;"  //outline
-                    "border-radius: 150px;"     //corners
+                    "border-radius: 15px;"     //corners
                     "font-size: 35px;"
                     );
         else if(col == Color::red)
             this->setStyleSheet(
                     "background-color: red;"
                     "border: 1px solid black;"  //outline
-                    "border-radius: 150px;"     //corners
+                    "border-radius: 15px;"     //corners
+                    "font-size: 35px;"
+                    );
+        else if(col == Color::white)
+            this->setStyleSheet(
+                    "background-color: white;"
+                    "border: 1px solid black;"  //outline
+                    "font-size: 35px;"
+                    );
+        else if(col == Color::black)
+            this->setStyleSheet(
+                    "background-color: black;"
+                    "border: 1px solid black;"  //outline
                     "font-size: 35px;"
                     );
     }else{
-        this->setStyleSheet(
-                "background-color: yellow;"
-                "border: 1px solid black;"  //outline
-                "border-radius: 150px;"     //corners
-                "font-size: 35px;"
-                );
+        if(this->color == Color::red || this->color == Color::green)
+            this->setStyleSheet(
+                    "background-color: yellow;"
+                    "border: 1px solid black;"  //outline
+                    "border-radius: 15px;"     //corners
+                    "font-size: 35px;"
+                    );
+        else
+            this->setStyleSheet(
+                    "background-color: blue;"
+                    "border: 1px solid black;"  //outline
+                    "font-size: 35px;"
+                    );
     }
-    this->setAutoFillBackground(true);
+
+    this->setAutoFillBackground(false);
     this->setPalette(pal);
     this->update();
 }
@@ -67,17 +87,18 @@ void Piece::myClick(){
         selectedPiece = nullptr;
 
     }
-//    isClicked = !isClicked;
-//    if(!isClicked)
-//        changeColor(this->color);
-//    else
-//        changeColor(Color::selected);
 }
 
 void Piece::getPos(){
 }
 
 void Piece::setPos(QPoint a){
-    this->setGeometry(a.x()-15,a.y()-15,30,30);
-    this->show();
+    if(this->color  == Color::black || this->color  == Color::white){
+        this->setGeometry(a.x()-25, a.y()-25, 50,50);
+        this->show();
+    }else{
+        this->setGeometry(a.x()-15,a.y()-15,30,30);
+        this->show();
+    }
+
 }
