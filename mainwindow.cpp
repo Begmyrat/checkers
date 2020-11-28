@@ -91,9 +91,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
             if(x != NULL && x->color!=Color::blank){
                 if(x->color==Color::red){
                     painter.setBrush(Qt::red);
-
                 }
-
                 else
                     painter.setBrush(Qt::green);
                 //painter.drawEllipse(QPoint((x->y)*50+25, x->x*50+25), 20,20);

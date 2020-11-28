@@ -1,6 +1,9 @@
 #include "piece.h"
 #include <QMessageBox>
 
+int g = 0;
+int r = 0;
+Piece *selectedPiece = nullptr;
 
 Piece::Piece(int x1,int y1, Color col, QMainWindow *w):QPushButton(w){
     x = x1;
@@ -41,15 +44,34 @@ void Piece::changeColor(Color col){
     this->update();
 }
 
+//Changes color to the original value
 void Piece::revertColor(){
     changeColor(this->color);
 }
 void Piece::myClick(){
-    isClicked = !isClicked;
-    if(!isClicked)
-        changeColor(this->color);
-    else
-        changeColor(Color::selected);
+    if(selectedPiece == nullptr){ //nothing clicked, click this
+        selectedPiece = this;
+        this->isClicked = true;
+        this->changeColor(Color::selected);
+    }else if(selectedPiece != this){ //something is clicked but not this
+        selectedPiece->isClicked = false;
+        selectedPiece->revertColor();
+        selectedPiece = this;
+
+        this->isClicked = true;
+        selectedPiece->changeColor(Color::selected);
+
+    }else if(selectedPiece == this){
+        this->isClicked = false;
+        this->revertColor();
+        selectedPiece = nullptr;
+
+    }
+//    isClicked = !isClicked;
+//    if(!isClicked)
+//        changeColor(this->color);
+//    else
+//        changeColor(Color::selected);
 }
 
 void Piece::getPos(){
