@@ -16,6 +16,23 @@ public:
     ~MainWindow();
     virtual void paintEvent(QPaintEvent *event);
 
+private slots:
+    void on_pushButton_File_clicked();
+
+    void on_pushButton_Edit_clicked();
+
+    void on_pushButton_Game_clicked();
+
+    void on_pushButton_Help_clicked();
+
+    void on_pushButton_NewGame_clicked();
+
+    void on_pushButton_Left_clicked();
+
+    void on_pushButton_Left_2_clicked();
+
+    void on_pushButton_Left_3_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

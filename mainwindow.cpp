@@ -3,7 +3,7 @@
 #include "qpainter.h"
 #include <vector>
 #include <piece.h>
-
+#include <QMessageBox>
 
 Piece *redObject[16];
 Piece *greenObject[16];
@@ -20,16 +20,16 @@ void drawPieces(QPainter painter){
             else{
                 painter.setBrush(Qt::white);
             }
-            painter.drawRect(j*50,i*50,50,50);
+            painter.drawRect(j*50,i*50+50,50,50);
 
             if(i==1 or i==2){
                 painter.setBrush(Qt::red);
-                painter.drawEllipse(QPoint(j*50+25, i*50+25), 20,20);
+                painter.drawEllipse(QPoint(j*50+25, i*50+75), 20,20);
 
             }
             else if(i==5 or i==6){
                 painter.setBrush(Qt::green);
-                painter.drawEllipse(QPoint(j*50+25, i*50+25), 20,20);
+                painter.drawEllipse(QPoint(j*50+25, i*50+75), 20,20);
             }
         }
     }
@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     for(int i=1;i<=2;i++){
         for(int j=0;j<8;j++){
             Piece *red = new Piece(i, j,Color::red, this);
-            red->setPos(QPoint((j)*50+25, i*50+25));
+            red->setPos(QPoint((j)*50+25, i*50+75));
             redObject[(i-1)*8+j] = red;
         }
     }
@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
         for(int j=0;j<8;j++){
             Piece *green = new Piece(i, j,Color::green, this);
             greenObject[(i-5)*8+j] = green;
-            green->setPos(QPoint((j)*50+25, i*50+25));
+            green->setPos(QPoint((j)*50+25, i*50+75));
         }
     }
     for(int i=0;i<16;i++){
@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
                 else
                     co = Color::white;
                 Piece *x = new Piece(i,j,co, this);
-                x->setPos(QPoint(j*50+25,i*50+25));
+                x->setPos(QPoint(j*50+25,i*50+75));
                 board[i][j] = x;
             }
         }
@@ -100,7 +100,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
             else{
                 painter.setBrush(Qt::white);
             }
-            painter.drawRect(j*50,i*50,50,50);
+            painter.drawRect(j*50,i*50+50,50,50);
             Piece *x = board[i][j];
             if(x != NULL && x->color!=Color::blank){
                 if(x->color==Color::red){
@@ -112,4 +112,44 @@ void MainWindow::paintEvent(QPaintEvent *event){
             }
         }
     }
+}
+
+void MainWindow::on_pushButton_File_clicked()
+{
+    QMessageBox::information(this, "title", "File Button is Clicked");
+}
+
+void MainWindow::on_pushButton_Edit_clicked()
+{
+    QMessageBox::information(this, "title", "Edit Button is Clicked");
+}
+
+void MainWindow::on_pushButton_Game_clicked()
+{
+    QMessageBox::information(this, "title", "Game Button is Clicked");
+}
+
+void MainWindow::on_pushButton_Help_clicked()
+{
+    QMessageBox::information(this, "title", "Help Button is Clicked");
+}
+
+void MainWindow::on_pushButton_NewGame_clicked()
+{
+    QMessageBox::information(this, "title", "NewGame Button is Clicked");
+}
+
+void MainWindow::on_pushButton_Left_clicked()
+{
+    QMessageBox::information(this, "title", "Left Button is Clicked");
+}
+
+void MainWindow::on_pushButton_Left_2_clicked()
+{
+    QMessageBox::information(this, "title", "Up Button is Clicked");
+}
+
+void MainWindow::on_pushButton_Left_3_clicked()
+{
+    QMessageBox::information(this, "title", "Right Button is Clicked");
 }
