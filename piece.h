@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <mainwindow.h>
 enum Color{red, green, blank, selected, black, white};
+
 class Piece:QPushButton
 {
     Q_OBJECT
@@ -12,16 +13,20 @@ class Piece:QPushButton
 public:
     Piece(int x1,int y1, Color col, QMainWindow *w);
     int x,y;
+    int current_x, current_y;
     Color color=blank;
     bool isClicked = false;
-
-    void getPos();
+    bool isChangingLocation= false;
+    QPoint getPos();
     void setPos(QPoint a);
     void changeColor(Color col);
+
 
 public slots:
     void myClick();
     void revertColor();
+    void myRelease();
 };
 
+extern Piece *selectedPiece;
 #endif // PIECE_H

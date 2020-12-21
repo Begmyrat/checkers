@@ -3,16 +3,20 @@
 
 int g = 0;
 int r = 0;
+
 Piece *selectedPiece = nullptr;
+bool isChangingLocation = false;
 
 Piece::Piece(int x1,int y1, Color col, QMainWindow *w):QPushButton(w){
     x = x1;
     y = y1;
     color = col;
-    this->connect( this , SIGNAL( clicked() ), this , SLOT( myClick() ) );
+    this->connect( this , SIGNAL( pressed() ), this , SLOT( myClick() ) );
+    this->connect(this, SIGNAL( released() ), this, SLOT(myRelease()));
     this->setParent(w);
     changeColor(col);
 }
+
 
 void Piece::changeColor(Color col){
     QPalette pal = this->palette();
@@ -68,15 +72,47 @@ void Piece::changeColor(Color col){
 void Piece::revertColor(){
     changeColor(this->color);
 }
+
+QPoint findIndex(QPoint pos){
+    int x = pos.x();
+
+    int y = pos.y();
+    int k = (x-25) / 50;
+    int l = (y-75) / 50;
+    return QPoint(k,l);
+}
+
+void Piece::myRelease(){
+
+    this->isClicked = false;
+    this->revertColor();
+    selectedPiece = nullptr;
+    if(abs(this->getPos().x() - this->current_x) < 20 && abs(this->getPos().y() - this->current_y) < 20){ //The piece is dropped in its borders no need to change anything
+        this->setPos(QPoint(current_x, current_y));
+    }else{
+        QPoint a = findIndex(QPoint(this->getPos().x(), this->getPos().y()));
+        printf("fdjsla;");
+        this->setPos(QPoint(a.x()*50+25, a.y()*50+75));
+    }
+
+
+
+
+
+}
+
+
 void Piece::myClick(){
     if(selectedPiece == nullptr){ //nothing clicked, click this
         selectedPiece = this;
         this->isClicked = true;
+        this->raise();
         this->changeColor(Color::selected);
     }else if(selectedPiece != this){ //something is clicked but not this
         selectedPiece->isClicked = false;
         selectedPiece->revertColor();
         selectedPiece = this;
+        this->raise();
 
         this->isClicked = true;
         selectedPiece->changeColor(Color::selected);
@@ -85,11 +121,14 @@ void Piece::myClick(){
         this->isClicked = false;
         this->revertColor();
         selectedPiece = nullptr;
-
     }
+
 }
 
-void Piece::getPos(){
+
+
+QPoint Piece::getPos(){
+    return QPoint(this->pos().x(), this->pos().y());
 }
 
 void Piece::setPos(QPoint a){

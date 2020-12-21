@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
 
     QPainter painter(this);
@@ -49,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
         for(int j=0;j<8;j++){
             Piece *red = new Piece(i, j,Color::red, this);
             red->setPos(QPoint((j)*50+25, i*50+75));
+            red->current_x = j*50+25, red->current_y = i*50+75;
             redObject[(i-1)*8+j] = red;
         }
     }
@@ -58,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
             Piece *green = new Piece(i, j,Color::green, this);
             greenObject[(i-5)*8+j] = green;
             green->setPos(QPoint((j)*50+25, i*50+75));
+            green->current_x = j*50+25, green->current_y = i*50+75;
         }
     }
     for(int i=0;i<16;i++){
@@ -77,19 +80,25 @@ MainWindow::MainWindow(QWidget *parent)
                     co = Color::white;
                 Piece *x = new Piece(i,j,co, this);
                 x->setPos(QPoint(j*50+25,i*50+75));
+                x->current_x = j*50+25, x->current_y = i*50+75;
                 board[i][j] = x;
             }
         }
     }
 
 }
-
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
 void MainWindow::paintEvent(QPaintEvent *event){
+    if(selectedPiece != nullptr && selectedPiece->color != Color::white && selectedPiece->color != Color::black){
+        QPoint x = this->mapFromGlobal(QCursor::pos());
+        selectedPiece->setPos(x);
+        this->update();
+    }
+
 
     QPainter painter(this);
     for(int i=0;i<8;i++){
