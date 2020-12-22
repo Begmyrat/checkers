@@ -29,4 +29,6 @@ public slots:
 };
 
 extern Piece *selectedPiece;
+extern Piece *board[8][8];
+extern QPoint *coordinate;
 #endif // PIECE_H

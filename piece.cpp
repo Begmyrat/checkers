@@ -1,22 +1,33 @@
 #include "piece.h"
 #include <QMessageBox>
-
+#include <math.h>
 int g = 0;
 int r = 0;
 
+
 Piece *selectedPiece = nullptr;
+QPoint *coordinate = new QPoint(0,0);
+QMainWindow *winn = nullptr;
+Piece *board[8][8] = {nullptr};
+
 bool isChangingLocation = false;
 
 Piece::Piece(int x1,int y1, Color col, QMainWindow *w):QPushButton(w){
+    winn = w;
     x = x1;
     y = y1;
+    this->setPos(QPoint(x*50+25, y*50+75));
+    this->current_x = x*50+25;
+    this->current_y = y*50+75;
     color = col;
+
+
     this->connect( this , SIGNAL( pressed() ), this , SLOT( myClick() ) );
     this->connect(this, SIGNAL( released() ), this, SLOT(myRelease()));
     this->setParent(w);
     changeColor(col);
+    this->setPos(QPoint(current_x, current_y));
 }
-
 
 void Piece::changeColor(Color col){
     QPalette pal = this->palette();
@@ -38,14 +49,14 @@ void Piece::changeColor(Color col){
         else if(col == Color::white)
             this->setStyleSheet(
                     "background-color: white;"
-                    "border: 1px solid black;"  //outline
-                    "font-size: 35px;"
+                    "border: 0px solid black;"  //outline
+                    "font-size: 50px;"
                     );
         else if(col == Color::black)
             this->setStyleSheet(
                     "background-color: black;"
-                    "border: 1px solid black;"  //outline
-                    "font-size: 35px;"
+                    "border: 0px solid black;"  //outline
+                    "font-size: 50px;"
                     );
     }else{
         if(this->color == Color::red || this->color == Color::green)
@@ -73,32 +84,69 @@ void Piece::revertColor(){
     changeColor(this->color);
 }
 
-QPoint findIndex(QPoint pos){
-    int x = pos.x();
-
-    int y = pos.y();
-    int k = (x-25) / 50;
-    int l = (y-75) / 50;
-    return QPoint(k,l);
+QPoint findIndexFromPos(QPoint pos){
+    float x = pos.x()-35;
+    float y = pos.y()-35;
+    int k = round((((x/50) * 50)-25) / 50.0f);
+    int l = round((((y/50)* 50)-75) / 50.0f);
+    return QPoint(k+1,l+1);
 }
 
+QPoint findIndexOfThis(Piece *thisPiece){
+    for (int i = 0; i<8 ;i++ ) {
+        for (int j = 0; j<8 ;j++ ) {
+            if(thisPiece == board[i][j]) return QPoint(i,j);
+        }
+    }
+}
 void Piece::myRelease(){
 
+    QPoint indexes = findIndexFromPos(*coordinate);
+    if(indexes.x() > 7 || indexes.y() > 7){
+        this->isClicked = false;
+        this->revertColor();
+        selectedPiece = nullptr;
+        this->setPos(QPoint(current_x, current_y));
+        return;
+    }
+    Piece *x = board[indexes.y()][indexes.x()];
+
+    printf("%d,%d\n", indexes.y(), indexes.x());
     this->isClicked = false;
     this->revertColor();
     selectedPiece = nullptr;
-    if(abs(this->getPos().x() - this->current_x) < 20 && abs(this->getPos().y() - this->current_y) < 20){ //The piece is dropped in its borders no need to change anything
-        this->setPos(QPoint(current_x, current_y));
-    }else{
-        QPoint a = findIndex(QPoint(this->getPos().x(), this->getPos().y()));
-        printf("fdjsla;");
-        this->setPos(QPoint(a.x()*50+25, a.y()*50+75));
+    if(this->color == Color::black || this->color == Color::white){
+        return;
     }
+    //The piece is dropped in its borders no need to change anything
+    if(abs(this->getPos().x() - this->current_x) < 20 && abs(this->getPos().y() - this->current_y) < 20){
+        this->setPos(QPoint(current_x, current_y));
+    }else{ //The piece is outside its previous border
+        if(x!= nullptr && (x->color == Color::black || x->color == Color::white) ){ //Will change position
+            QPoint a = findIndexFromPos(QPoint(this->getPos().x(), this->getPos().y()));
 
 
+            Piece *other_piece_being_swapped = board[a.y()][a.x()];
+            delete other_piece_being_swapped;
+            QPoint curr_pos = findIndexFromPos(QPoint(current_x, current_y));
+            Color c;
+
+            (curr_pos.x()+curr_pos.y())%2 == 1 ? c = Color::black : c = Color::white;
+
+            board[curr_pos.y()][curr_pos.x()] = new Piece(curr_pos.x(), curr_pos.y(),c, winn);
+            board[a.y()][a.x()] = this;
+            QPoint this_index = findIndexOfThis(this);
+            //board[this_index.x()][this_index.y()] = other_piece_being_swapped;
 
 
+            this->setPos(QPoint((a.x())*50+25, (a.y())*50+75));
+            current_x = a.x()*50+25, current_y = a.y()*50+75;
 
+        }else{ //Dont change position
+             this->setPos(QPoint(current_x, current_y));
+        }
+
+    }
 }
 
 
@@ -106,7 +154,8 @@ void Piece::myClick(){
     if(selectedPiece == nullptr){ //nothing clicked, click this
         selectedPiece = this;
         this->isClicked = true;
-        this->raise();
+        if(this->color == Color::red || this->color == Color::green)
+            this->raise();
         this->changeColor(Color::selected);
     }else if(selectedPiece != this){ //something is clicked but not this
         selectedPiece->isClicked = false;

@@ -7,35 +7,34 @@
 
 Piece *redObject[16];
 Piece *greenObject[16];
-Piece *board[8][8] = {nullptr};
 
-void drawPieces(QPainter painter){
-    printf("Printing Pieces");
+//void drawPieces(QPainter painter){
+//    printf("Printing Pieces");
 
-    for(int i=0;i<8;i++){
-        for(int j=0;j<8;j++){
-            if((i+j)%2){
-                painter.setBrush(Qt::black);
-            }
-            else{
-                painter.setBrush(Qt::white);
-            }
-            painter.drawRect(j*50,i*50+50,50,50);
+//    for(int i=0;i<8;i++){
+//        for(int j=0;j<8;j++){
+//            if((i+j)%2){
+//                painter.setBrush(Qt::black);
+//            }
+//            else{
+//                painter.setBrush(Qt::white);
+//            }
+//            painter.drawRect(j*50,i*50+50,50,50);
 
-            if(i==1 or i==2){
-                painter.setBrush(Qt::red);
-                painter.drawEllipse(QPoint(j*50+25, i*50+75), 20,20);
+//            if(i==1 or i==2){
+//                painter.setBrush(Qt::red);
+//                painter.drawEllipse(QPoint(j*50+25, i*50+75), 20,20);
 
-            }
-            else if(i==5 or i==6){
-                painter.setBrush(Qt::green);
-                painter.drawEllipse(QPoint(j*50+25, i*50+75), 20,20);
-            }
-        }
-    }
+//            }
+//            else if(i==5 or i==6){
+//                painter.setBrush(Qt::green);
+//                painter.drawEllipse(QPoint(j*50+25, i*50+75), 20,20);
+//            }
+//        }
+//    }
 
 
-}
+//}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -93,9 +92,13 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::paintEvent(QPaintEvent *event){
+
     if(selectedPiece != nullptr && selectedPiece->color != Color::white && selectedPiece->color != Color::black){
         QPoint x = this->mapFromGlobal(QCursor::pos());
         selectedPiece->setPos(x);
+        coordinate->setX(x.x());
+        coordinate->setY(x.y());
+
         this->update();
     }
 
