@@ -165,18 +165,25 @@ void Piece::myRelease(){
 
         bool izin = true;
 
-        if(this->color==Color::red){
-            if((this->color==Color::red && displacementInY==1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){
-
-            }
-            else{
+        if(this->isKing){
+            if(displacementInX!=0 && displacementInY!=0){
                 izin=false;
             }
         }
-        else if(this->color==Color::green){
-            if((this->color==Color::green && displacementInY==-1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){}
-            else{
-                izin = false;
+        else{
+            if(this->color==Color::red){
+                if((displacementInY==1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){
+
+                }
+                else{
+                    izin=false;
+                }
+            }
+            else if(this->color==Color::green){
+                if((displacementInY==-1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){}
+                else{
+                    izin = false;
+                }
             }
         }
 
