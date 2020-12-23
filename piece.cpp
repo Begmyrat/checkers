@@ -169,6 +169,7 @@ void Piece::myRelease(){
             if(displacementInX!=0 && displacementInY!=0){
                 izin=false;
             }
+            else{}
         }
         else{
             if(this->color==Color::red){
