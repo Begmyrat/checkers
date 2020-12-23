@@ -32,20 +32,44 @@ Piece::Piece(int x1,int y1, Color col, QMainWindow *w):QPushButton(w){
 void Piece::changeColor(Color col){
     QPalette pal = this->palette();
     if(!isClicked){
-        if(col == Color::green)
-            this->setStyleSheet(
-                    "background-color: green;"
-                    "border: 1px solid black;"  //outline
-                    "border-radius: 15px;"     //corners
-                    "font-size: 35px;"
-                    );
-        else if(col == Color::red)
-            this->setStyleSheet(
-                    "background-color: red;"
-                    "border: 1px solid black;"  //outline
-                    "border-radius: 15px;"     //corners
-                    "font-size: 35px;"
-                    );
+        if(col == Color::green){
+            if(!this->isKing){
+                this->setStyleSheet(
+                        "background-color: green;"
+                        "border: 1px solid black;"  //outline
+                        "border-radius: 15px;"     //corners
+                        "font-size: 35px;"
+                        );
+            }
+            else{
+                this->setStyleSheet(
+                        "background-color: green;"
+                        "border: 1px solid black;"  //outline
+                        "border-radius: 0px;"     //corners
+                        "font-size: 35px;"
+                        );
+            }
+
+        }
+        else if(col == Color::red){
+            if(!this->isKing){
+                this->setStyleSheet(
+                        "background-color: red;"
+                        "border: 1px solid black;"  //outline
+                        "border-radius: 15px;"     //corners
+                        "font-size: 35px;"
+                        );
+            }
+            else{
+                this->setStyleSheet(
+                        "background-color: red;"
+                        "border: 1px solid black;"  //outline
+                        "border-radius: 0px;"     //corners
+                        "font-size: 35px;"
+                        );
+            }
+
+        }
         else if(col == Color::white)
             this->setStyleSheet(
                     "background-color: white;"
@@ -59,13 +83,24 @@ void Piece::changeColor(Color col){
                     "font-size: 50px;"
                     );
     }else{
-        if(this->color == Color::red || this->color == Color::green)
-            this->setStyleSheet(
-                    "background-color: yellow;"
-                    "border: 1px solid black;"  //outline
-                    "border-radius: 15px;"     //corners
-                    "font-size: 35px;"
-                    );
+        if(this->color == Color::red || this->color == Color::green){
+            if(this->isKing){
+                this->setStyleSheet(
+                        "background-color: yellow;"
+                        "border: 1px solid black;"  //outline
+                        "border-radius: 0px;"     //corners
+                        "font-size: 35px;"
+                        );
+            }
+            else{
+                this->setStyleSheet(
+                        "background-color: yellow;"
+                        "border: 1px solid black;"  //outline
+                        "border-radius: 15px;"     //corners
+                        "font-size: 35px;"
+                        );
+            }
+        }
         else
             this->setStyleSheet(
                     "background-color: blue;"
@@ -101,6 +136,7 @@ QPoint findIndexOfThis(Piece *thisPiece){
 }
 void Piece::myRelease(){
 
+
     QPoint indexes = findIndexFromPos(*coordinate);
     if(indexes.x() > 7 || indexes.y() > 7){
         this->isClicked = false;
@@ -122,31 +158,72 @@ void Piece::myRelease(){
     if(abs(this->getPos().x() - this->current_x) < 20 && abs(this->getPos().y() - this->current_y) < 20){
         this->setPos(QPoint(current_x, current_y));
     }else{ //The piece is outside its previous border
-        if(x!= nullptr && (x->color == Color::black || x->color == Color::white) ){ //Will change position
-            QPoint a = findIndexFromPos(QPoint(this->getPos().x(), this->getPos().y()));
 
+        QPoint b = findIndexFromPos(QPoint(this->getPos().x(), this->getPos().y()));
+        int displacementInX = b.x() - findIndexOfThis(this).y();
+        int displacementInY = b.y() - findIndexOfThis(this).x();
 
-            Piece *other_piece_being_swapped = board[a.y()][a.x()];
-            delete other_piece_being_swapped;
-            QPoint curr_pos = findIndexFromPos(QPoint(current_x, current_y));
-            Color c;
+        bool izin = true;
 
-            (curr_pos.x()+curr_pos.y())%2 == 1 ? c = Color::black : c = Color::white;
+        if(this->color==Color::red){
+            if((this->color==Color::red && displacementInY==1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){
 
-            board[curr_pos.y()][curr_pos.x()] = new Piece(curr_pos.x(), curr_pos.y(),c, winn);
-            board[a.y()][a.x()] = this;
-            QPoint this_index = findIndexOfThis(this);
-            //board[this_index.x()][this_index.y()] = other_piece_being_swapped;
-
-
-            this->setPos(QPoint((a.x())*50+25, (a.y())*50+75));
-            current_x = a.x()*50+25, current_y = a.y()*50+75;
-
-        }else{ //Dont change position
-             this->setPos(QPoint(current_x, current_y));
+            }
+            else{
+                izin=false;
+            }
+        }
+        else if(this->color==Color::green){
+            if((this->color==Color::green && displacementInY==-1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){}
+            else{
+                izin = false;
+            }
         }
 
+
+        if(izin){
+            if(x!= nullptr && (x->color == Color::black || x->color == Color::white)){ //Will change position
+                QPoint a = findIndexFromPos(QPoint(this->getPos().x(), this->getPos().y()));
+
+
+                Piece *other_piece_being_swapped = board[a.y()][a.x()];
+                delete other_piece_being_swapped;
+                QPoint curr_pos = findIndexFromPos(QPoint(current_x, current_y));
+                Color c;
+
+                (curr_pos.x()+curr_pos.y())%2 == 1 ? c = Color::black : c = Color::white;
+
+                board[curr_pos.y()][curr_pos.x()] = new Piece(curr_pos.x(), curr_pos.y(),c, winn);
+                board[a.y()][a.x()] = this;
+                QPoint this_index = findIndexOfThis(this);
+                //board[this_index.x()][this_index.y()] = other_piece_being_swapped;
+
+
+                this->setPos(QPoint((a.x())*50+25, (a.y())*50+75));
+                current_x = a.x()*50+25, current_y = a.y()*50+75;
+
+            }else{ //Dont change position
+                 this->setPos(QPoint(current_x, current_y));
+            }
+        }
+        else{
+            this->setPos(QPoint(current_x, current_y));
+        }
+
+
+
     }
+
+    QPoint z = findIndexOfThis(this);
+
+    if((z.x()==0 || z.x()==7)){
+        this->isKing = true;
+        this->changeColor(this->color);
+    }
+//    else if(this->color==Color::red && z.x()==7){
+//        this->isKing = true;
+//        this->changeColor(this->color);
+//    }
 }
 
 

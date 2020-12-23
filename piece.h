@@ -15,6 +15,7 @@ public:
     int x,y;
     int current_x, current_y;
     Color color=blank;
+    bool isKing = false;
     bool isClicked = false;
     bool isChangingLocation= false;
     QPoint getPos();
