@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
         for(int j=0;j<8;j++){
             Piece *red = new Piece(i, j,Color::red, this);
             red->setPos(QPoint((j)*50+25, i*50+75));
-            red->current_x = j*50+25, red->current_y = i*50+75;
+            red->current_x_screen_pos = j*50+25, red->current_y_screen_pos = i*50+75;
             redObject[(i-1)*8+j] = red;
         }
     }
@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
             Piece *green = new Piece(i, j,Color::green, this);
             greenObject[(i-5)*8+j] = green;
             green->setPos(QPoint((j)*50+25, i*50+75));
-            green->current_x = j*50+25, green->current_y = i*50+75;
+            green->current_x_screen_pos = j*50+25, green->current_y_screen_pos = i*50+75;
         }
     }
     for(int i=0;i<16;i++){
@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
                     co = Color::white;
                 Piece *x = new Piece(i,j,co, this);
                 x->setPos(QPoint(j*50+25,i*50+75));
-                x->current_x = j*50+25, x->current_y = i*50+75;
+                x->current_x_screen_pos = j*50+25, x->current_y_screen_pos = i*50+75;
                 board[i][j] = x;
             }
         }
@@ -98,7 +98,6 @@ void MainWindow::paintEvent(QPaintEvent *event){
         selectedPiece->setPos(x);
         coordinate->setX(x.x());
         coordinate->setY(x.y());
-
         this->update();
     }
 

@@ -17,8 +17,8 @@ Piece::Piece(int x1,int y1, Color col, QMainWindow *w):QPushButton(w){
     x = x1;
     y = y1;
     this->setPos(QPoint(x*50+25, y*50+75));
-    this->current_x = x*50+25;
-    this->current_y = y*50+75;
+    this->current_x_screen_pos = x*50+25;
+    this->current_y_screen_pos = y*50+75;
     color = col;
 
 
@@ -26,7 +26,7 @@ Piece::Piece(int x1,int y1, Color col, QMainWindow *w):QPushButton(w){
     this->connect(this, SIGNAL( released() ), this, SLOT(myRelease()));
     this->setParent(w);
     changeColor(col);
-    this->setPos(QPoint(current_x, current_y));
+    this->setPos(QPoint(current_x_screen_pos, current_y_screen_pos));
 }
 
 void Piece::changeColor(Color col){
@@ -134,15 +134,32 @@ QPoint findIndexOfThis(Piece *thisPiece){
         }
     }
 }
+/*
+ * x and y is the indexes
+ * between 0 and 7
+*/
+Piece* Piece::findIfPieceIsEatable(int index_x, int index_y){
+
+    Piece *p = board[index_x][index_y];
+    if(p->color == Color::black || p->color == Color::white ){
+        return nullptr;
+    }else if(this->color == Color::green && p->color == Color::red){
+        return p;
+    }else if(this->color == Color::red && p->color == Color::green){
+        return p;
+    }
+    return nullptr;
+}
+
 void Piece::myRelease(){
 
-
     QPoint indexes = findIndexFromPos(*coordinate);
+
     if(indexes.x() > 7 || indexes.y() > 7){
         this->isClicked = false;
         this->revertColor();
         selectedPiece = nullptr;
-        this->setPos(QPoint(current_x, current_y));
+        this->setPos(QPoint(current_x_screen_pos, current_y_screen_pos));
         return;
     }
     Piece *x = board[indexes.y()][indexes.x()];
@@ -155,8 +172,8 @@ void Piece::myRelease(){
         return;
     }
     //The piece is dropped in its borders no need to change anything
-    if(abs(this->getPos().x() - this->current_x) < 20 && abs(this->getPos().y() - this->current_y) < 20){
-        this->setPos(QPoint(current_x, current_y));
+    if(abs(this->getPos().x() - this->current_x_screen_pos) < 20 && abs(this->getPos().y() - this->current_y_screen_pos) < 20){
+        this->setPos(QPoint(current_x_screen_pos, current_y_screen_pos));
     }else{ //The piece is outside its previous border
 
         QPoint b = findIndexFromPos(QPoint(this->getPos().x(), this->getPos().y()));
@@ -165,38 +182,94 @@ void Piece::myRelease(){
 
         bool izin = true;
 
-        if(this->isKing){
-            if(displacementInX!=0 && displacementInY!=0){
+        if(this->isKing){ //If king
+            if(displacementInX!=0 && displacementInY!=0){ //If did not move
                 izin=false;
             }
-            else{}
+            else{ //If tried to move
+
+            }
         }
-        else{
-            if(this->color==Color::red){
+        else{ //If not king
+            if(this->color==Color::red){ //If red
                 if((displacementInY==1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){
 
                 }
-                else{
+                else{ //If made an illegal move
                     izin=false;
                 }
             }
             else if(this->color==Color::green){
-                if((displacementInY==-1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){}
+                if((displacementInY==-1 && displacementInX==0) || (displacementInY==0 && (displacementInX==-1 || displacementInX==1))){
+
+                }else if(
+                         ((displacementInY==-2 && displacementInX==0) || (displacementInY==0 && (displacementInX==-2 || displacementInX==2)))
+                         &&
+                         ((x->color == Color::black || x->color == Color::white))
+                        )
+                {
+                    if(displacementInY == -2){ //Trying to eat to up
+                        Piece *p = findIfPieceIsEatable(findIndexOfThis(this).x()-1, findIndexOfThis(this).y());
+                        if(p == nullptr){//Cannot eat
+                            izin = false;
+                        }else{
+                            QPoint a = findIndexOfThis(p);
+
+                            if( ( (a.x() + a.y()) % 2 ) == 0){
+                                delete board[a.x()][a.y()];
+                                board[a.x()][a.y()] = new Piece(a.y(),a.x(), Color::white, winn);
+                            }else if( ( (a.x() + a.y()) % 2 ) == 1){
+                                board[a.x()][a.y()] = new Piece(a.y(),a.x(), Color::black, winn);
+                            }
+                                board[a.x()][a.y()]->changeColor(board[a.x()][a.y()]->color);
+                        }
+                    }else if(displacementInX == -2){ //Trying to eat to left
+                        Piece *p = findIfPieceIsEatable(findIndexOfThis(this).x(), findIndexOfThis(this).y()-1);
+                        if(p == nullptr){//Cannot eat
+                            izin = false;
+                        }else{
+                            QPoint a = findIndexOfThis(p);
+
+                            if( ( (a.x() + a.y()) % 2 ) == 0){
+                                delete board[a.x()][a.y()];
+                                board[a.x()][a.y()] = new Piece(a.y(),a.x(), Color::white, winn);
+                            }else if( ( (a.x() + a.y()) % 2 ) == 1){
+                                board[a.x()][a.y()] = new Piece(a.y(),a.x(), Color::black, winn);
+                            }
+                                board[a.x()][a.y()]->changeColor(board[a.x()][a.y()]->color);
+                        }
+                    }else if(displacementInX == 2){ //Trying to eat to right
+                        Piece *p = findIfPieceIsEatable(findIndexOfThis(this).x(), findIndexOfThis(this).y()+1);
+                        if(p == nullptr){//Cannot eat
+                            izin = false;
+                        }else{
+                            QPoint a = findIndexOfThis(p);
+
+                            if( ( (a.x() + a.y()) % 2 ) == 0){
+                                delete board[a.x()][a.y()];
+                                board[a.x()][a.y()] = new Piece(a.y(),a.x(), Color::white, winn);
+                            }else if( ( (a.x() + a.y()) % 2 ) == 1){
+                                board[a.x()][a.y()] = new Piece(a.y(),a.x(), Color::black, winn);
+                            }
+                                board[a.x()][a.y()]->changeColor(board[a.x()][a.y()]->color);
+                        }
+                    }else{ //If made an illegal move
+
+                    }
+                }
                 else{
                     izin = false;
                 }
             }
         }
 
-
         if(izin){
             if(x!= nullptr && (x->color == Color::black || x->color == Color::white)){ //Will change position
                 QPoint a = findIndexFromPos(QPoint(this->getPos().x(), this->getPos().y()));
 
-
                 Piece *other_piece_being_swapped = board[a.y()][a.x()];
                 delete other_piece_being_swapped;
-                QPoint curr_pos = findIndexFromPos(QPoint(current_x, current_y));
+                QPoint curr_pos = findIndexFromPos(QPoint(current_x_screen_pos, current_y_screen_pos));
                 Color c;
 
                 (curr_pos.x()+curr_pos.y())%2 == 1 ? c = Color::black : c = Color::white;
@@ -208,14 +281,14 @@ void Piece::myRelease(){
 
 
                 this->setPos(QPoint((a.x())*50+25, (a.y())*50+75));
-                current_x = a.x()*50+25, current_y = a.y()*50+75;
+                current_x_screen_pos = a.x()*50+25, current_y_screen_pos = a.y()*50+75;
 
             }else{ //Dont change position
-                 this->setPos(QPoint(current_x, current_y));
+                 this->setPos(QPoint(current_x_screen_pos, current_y_screen_pos));
             }
         }
         else{
-            this->setPos(QPoint(current_x, current_y));
+            this->setPos(QPoint(current_x_screen_pos, current_y_screen_pos));
         }
 
 

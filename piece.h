@@ -13,7 +13,7 @@ class Piece:QPushButton
 public:
     Piece(int x1,int y1, Color col, QMainWindow *w);
     int x,y;
-    int current_x, current_y;
+    int current_x_screen_pos, current_y_screen_pos;
     Color color=blank;
     bool isKing = false;
     bool isClicked = false;
@@ -21,6 +21,7 @@ public:
     QPoint getPos();
     void setPos(QPoint a);
     void changeColor(Color col);
+    Piece* findIfPieceIsEatable(int index_x, int index_y);
 
 
 public slots:
